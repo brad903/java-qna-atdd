@@ -14,7 +14,7 @@ import support.test.AcceptanceTest;
 
 import java.util.Arrays;
 
-public class UserAcceptanceTest extends AcceptanceTest {
+public class UserAcceptanceTest extends AcceptanceTest {  // AcceptanceTest에 설정이 다 들어감, 중복제거하기 위함
     private static final Logger log = LoggerFactory.getLogger(UserAcceptanceTest.class);
 
     @Autowired
@@ -22,8 +22,8 @@ public class UserAcceptanceTest extends AcceptanceTest {
 
     @Test
     public void createForm() throws Exception {
-        ResponseEntity<String> response = template().getForEntity("/users/form", String.class);
-        softly.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        ResponseEntity<String> response = template().getForEntity("/users/form", String.class);  // get방식으로 요청을 보냄
+        softly.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);  // softly를 쓰면 따로 import 필요없음
         log.debug("body : {}", response.getBody());
     }
 

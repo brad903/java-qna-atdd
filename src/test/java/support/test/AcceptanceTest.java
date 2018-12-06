@@ -10,7 +10,7 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)  // 서버를 알아서 가동시켜줌
 public abstract class AcceptanceTest extends BaseTest {
     private static final String DEFAULT_LOGIN_USER = "javajigi";
 
