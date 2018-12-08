@@ -1,4 +1,4 @@
-package codesquad.controller;
+package codesquad.web;
 
 import codesquad.UnAuthenticationException;
 import codesquad.domain.User;

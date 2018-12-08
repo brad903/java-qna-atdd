@@ -16,8 +16,8 @@ public class LoginAcceptanceTest extends AcceptanceTest {
 
     @Test
     public void loginForm() throws Exception {
-        ResponseEntity<String> response = template().getForEntity("/login/form", String.class);  // get방식으로 요청을 보냄
-        softly.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);  // softly를 쓰면 따로 import 필요없음
+        ResponseEntity<String> response = template().getForEntity("/login/form", String.class);
+        softly.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         log.debug("body : {}", response.getBody());
     }
 
@@ -28,13 +28,13 @@ public class LoginAcceptanceTest extends AcceptanceTest {
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
         MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
-        params.add("userId", "javajigi");
-        params.add("password", "test");
-        HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<MultiValueMap<String, Object>>(params, headers);
+        params.add("userId", "brad903");
+        params.add("password", "1234");
+        HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<>(params, headers);
 
         ResponseEntity<String> response = template().postForEntity("/login", request, String.class);
 
-        softly.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FOUND);  // Controller에서 redirect시 302 상태메시지를 보냄
+        softly.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FOUND);
         softly.assertThat(response.getHeaders().getLocation().getPath()).isEqualTo("/");
     }
 
@@ -51,7 +51,7 @@ public class LoginAcceptanceTest extends AcceptanceTest {
 
         ResponseEntity<String> response = template().postForEntity("/login", request, String.class);
 
-        softly.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);  // Controller에서 redirect시 302 상태메시지를 보냄
+        softly.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         softly.assertThat(response.getBody().contains("아이디 또는 비밀번호가 틀립니다")).isTrue();
     }
 
