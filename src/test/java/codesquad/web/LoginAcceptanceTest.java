@@ -16,7 +16,7 @@ public class LoginAcceptanceTest extends AcceptanceTest {
 
     @Test
     public void loginForm() throws Exception {
-        ResponseEntity<String> response = template().getForEntity("/login/form", String.class);
+        ResponseEntity<String> response = template().getForEntity("/users/login", String.class);
         softly.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         log.debug("body : {}", response.getBody());
     }
@@ -32,7 +32,7 @@ public class LoginAcceptanceTest extends AcceptanceTest {
         params.add("password", "1234");
         HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<>(params, headers);
 
-        ResponseEntity<String> response = template().postForEntity("/login", request, String.class);
+        ResponseEntity<String> response = template().postForEntity("/users/login", request, String.class);
 
         softly.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FOUND);
         softly.assertThat(response.getHeaders().getLocation().getPath()).isEqualTo("/");
@@ -49,7 +49,7 @@ public class LoginAcceptanceTest extends AcceptanceTest {
         params.add("password", "test2");
         HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<MultiValueMap<String, Object>>(params, headers);
 
-        ResponseEntity<String> response = template().postForEntity("/login", request, String.class);
+        ResponseEntity<String> response = template().postForEntity("/users/login", request, String.class);
 
         softly.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         softly.assertThat(response.getBody().contains("아이디 또는 비밀번호가 틀립니다")).isTrue();
