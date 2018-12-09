@@ -86,9 +86,9 @@ public class UserAcceptanceTest extends AcceptanceTest {
 
         MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
         params.add("_method", "put");
-        params.add("password", "test");
-        params.add("name", "자바지기2");
-        params.add("email", "javajigi@slipp.net");
+        params.add("password", "1234");
+        params.add("name", "브래드");
+        params.add("email", "brad903@naver.com");
         HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<MultiValueMap<String, Object>>(params, headers);
 
         return template.postForEntity(String.format("/users/%d", defaultUser().getId()), request, String.class);
