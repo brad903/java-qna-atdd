@@ -25,7 +25,7 @@ public class QuestionAcceptanceTest extends AcceptanceTest {
     }
 
     @Test
-    public void form_no_login() throws Exception {
+    public void form_not_login() throws Exception {
         ResponseEntity<String> response = template().getForEntity("/questions/form", String.class);
         softly.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
     }
@@ -38,7 +38,7 @@ public class QuestionAcceptanceTest extends AcceptanceTest {
     }
 
     @Test
-    public void create_no_login() throws Exception {
+    public void create_not_login() throws Exception {
         ResponseEntity<String> response = template().postForEntity("/questions", request, String.class);
         softly.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
     }
@@ -67,6 +67,26 @@ public class QuestionAcceptanceTest extends AcceptanceTest {
     public void home() {
         ResponseEntity<String> response = template().getForEntity("/", String.class);
         softly.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        log.debug("body : {}", response.getBody());
+    }
+
+    @Test
+    public void updateForm_not_login() {
+        ResponseEntity<String> response = template().getForEntity("/questions/1/form", String.class);
+        softly.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+    }
+
+    @Test
+    public void updateForm_not_same_writer() {
+        ResponseEntity<String> response = basicAuthTemplate(defaultUser()).getForEntity("/questions/2/form", String.class);
+        softly.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+    }
+
+    @Test
+    public void updateForm_same_writer() {
+        ResponseEntity<String> response = basicAuthTemplate(defaultUser()).getForEntity("/questions/1/form", String.class);
+        softly.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        softly.assertThat(response.getBody()).contains("수정하기");
         log.debug("body : {}", response.getBody());
     }
 }

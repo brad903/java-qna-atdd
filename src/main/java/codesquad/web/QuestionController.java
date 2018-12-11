@@ -1,5 +1,6 @@
 package codesquad.web;
 
+import codesquad.UnAuthorizedException;
 import codesquad.domain.Question;
 import codesquad.domain.User;
 import codesquad.security.LoginUser;
@@ -40,10 +41,19 @@ public class QuestionController {
 
     @GetMapping("/{id}")
     public String show(@PathVariable Long id, Model model) {
-        Question question = qnaService.findById(id)
-                            .orElseThrow(EntityNotFoundException::new);
+        Question question = qnaService.findById(id).orElseThrow(EntityNotFoundException::new);
         model.addAttribute("question", question);
         return "qna/show";
+    }
+
+    @GetMapping("/{id}/form")
+    public String updateForm(@LoginUser User loginUser, @PathVariable Long id, Model model) {
+        Question question = qnaService.findById(id).orElseThrow(EntityNotFoundException::new);
+        if(!question.isOwner(loginUser)) {
+            throw new UnAuthorizedException();
+        }
+        model.addAttribute("question", question);
+        return "qna/updateForm";
     }
 
 
