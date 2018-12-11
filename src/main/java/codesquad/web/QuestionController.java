@@ -9,10 +9,7 @@ import org.hibernate.annotations.GeneratorType;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.persistence.EntityNotFoundException;
@@ -55,6 +52,14 @@ public class QuestionController {
         model.addAttribute("question", question);
         return "qna/updateForm";
     }
+
+    @PutMapping("/{id}")
+    public String udpate(@LoginUser User loginUser, @PathVariable Long id, Question updatedQuestion, Model model) {
+        Question question = qnaService.update(loginUser, id,updatedQuestion);
+        model.addAttribute("question", question);
+        return "qna/show";
+    }
+
 
 
 }

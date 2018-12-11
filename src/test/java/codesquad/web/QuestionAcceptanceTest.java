@@ -1,5 +1,6 @@
 package codesquad.web;
 
+import codesquad.domain.Question;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -14,13 +15,24 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 public class QuestionAcceptanceTest extends AcceptanceTest {
     private static final Logger log = getLogger(QuestionAcceptanceTest.class);
-    HttpEntity<MultiValueMap<String, Object>> request;
+    Question testQuestion;
+    Question updatedQuestion;
+    HttpEntity<MultiValueMap<String, Object>> testRequest;
+    HttpEntity<MultiValueMap<String, Object>> updateRequest;
 
     @Before
     public void setUp() throws Exception {
-        request = HtmlFormDataBuilder.urlEncodedForm()
-                .addParameter("title", "제목 테스트")
-                .addParameter("contents", "내용 테스트 - 코드스쿼드 qna-atdd step2 진행중입니다")
+        testQuestion = new Question("제목 테스트", "내용 테스트 - 코드스쿼드 qna-atdd step2 진행중입니다");
+        updatedQuestion = new Question("업데이트된 제목", "업데이트된 내용입니다");
+
+        testRequest = HtmlFormDataBuilder.urlEncodedForm()
+                .addParameter("title", testQuestion.getTitle())
+                .addParameter("contents", testQuestion.getContents())
+                .build();
+
+        updateRequest = HtmlFormDataBuilder.urlEncodedForm().put()
+                .addParameter("title", updatedQuestion.getTitle())
+                .addParameter("contents", updatedQuestion.getContents())
                 .build();
     }
 
@@ -39,13 +51,13 @@ public class QuestionAcceptanceTest extends AcceptanceTest {
 
     @Test
     public void create_not_login() throws Exception {
-        ResponseEntity<String> response = template().postForEntity("/questions", request, String.class);
+        ResponseEntity<String> response = template().postForEntity("/questions", testRequest, String.class);
         softly.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
     }
 
     @Test
     public void create_login() throws Exception {
-        ResponseEntity<String> response = basicAuthTemplate(defaultUser()).postForEntity("/questions", request, String.class);
+        ResponseEntity<String> response = basicAuthTemplate(defaultUser()).postForEntity("/questions", testRequest, String.class);
         softly.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FOUND);
         softly.assertThat(response.getHeaders().getLocation().getPath()).startsWith("/questions/");
     }
@@ -88,5 +100,25 @@ public class QuestionAcceptanceTest extends AcceptanceTest {
         softly.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         softly.assertThat(response.getBody()).contains("수정하기");
         log.debug("body : {}", response.getBody());
+    }
+
+    @Test
+    public void update_not_login() {
+        ResponseEntity<String> response = template().postForEntity("/questions/1", updateRequest, String.class);
+        softly.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+    }
+
+    @Test
+    public void update_not_same_writer() {
+        ResponseEntity<String> response = basicAuthTemplate(defaultUser()).postForEntity("/questions/2", updateRequest, String.class);
+        softly.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+    }
+
+    @Test
+    public void update_succeed() {
+        ResponseEntity<String> response = basicAuthTemplate(defaultUser()).postForEntity("/questions/1", updateRequest, String.class);
+        softly.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        softly.assertThat(response.getBody()).contains(updatedQuestion.getTitle());
+        softly.assertThat(response.getBody()).contains(updatedQuestion.getContents());
     }
 }
