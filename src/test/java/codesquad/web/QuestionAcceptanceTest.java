@@ -46,9 +46,8 @@ public class QuestionAcceptanceTest extends AcceptanceTest {
     @Test
     public void create_login() throws Exception {
         ResponseEntity<String> response = basicAuthTemplate(defaultUser()).postForEntity("/questions", request, String.class);
-        softly.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        softly.assertThat(response.getBody()).contains(defaultUser().getName());
-        log.debug("body : {}", response.getBody());
+        softly.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FOUND);
+        softly.assertThat(response.getHeaders().getLocation().getPath()).startsWith("/questions/");
     }
 
     @Test

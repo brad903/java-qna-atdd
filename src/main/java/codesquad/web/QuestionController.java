@@ -35,7 +35,7 @@ public class QuestionController {
     public String create(@LoginUser User loginUser, Question question, Model model) {
         question = qnaService.create(loginUser, question);
         model.addAttribute("question", question);
-        return "qna/show";
+        return "redirect:" + question.generateUrl();
     }
 
     @GetMapping("/{id}")
