@@ -19,6 +19,7 @@ public class QuestionAcceptanceTest extends AcceptanceTest {
     Question updatedQuestion;
     HttpEntity<MultiValueMap<String, Object>> testRequest;
     HttpEntity<MultiValueMap<String, Object>> updateRequest;
+    HttpEntity<MultiValueMap<String, Object>> deleteRequest;
 
     @Before
     public void setUp() throws Exception {
@@ -34,6 +35,8 @@ public class QuestionAcceptanceTest extends AcceptanceTest {
                 .addParameter("title", updatedQuestion.getTitle())
                 .addParameter("contents", updatedQuestion.getContents())
                 .build();
+
+        deleteRequest = HtmlFormDataBuilder.urlEncodedForm().delete().build();
     }
 
     @Test
@@ -120,5 +123,24 @@ public class QuestionAcceptanceTest extends AcceptanceTest {
         softly.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         softly.assertThat(response.getBody()).contains(updatedQuestion.getTitle());
         softly.assertThat(response.getBody()).contains(updatedQuestion.getContents());
+    }
+
+    @Test
+    public void delete_not_login() {
+        ResponseEntity<String> response = template().postForEntity("/questions/1", deleteRequest, String.class);
+        softly.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+    }
+
+    @Test
+    public void delete_not_same_writer() {
+        ResponseEntity<String> response = basicAuthTemplate(defaultUser()).postForEntity("/questions/2", deleteRequest, String.class);
+        softly.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+    }
+
+    @Test
+    public void delete_succeed() {
+        ResponseEntity<String> response = basicAuthTemplate(defaultUser()).postForEntity("/questions/1", deleteRequest, String.class);
+        softly.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FOUND);
+        softly.assertThat(response.getHeaders().getLocation().getPath()).startsWith("/");
     }
 }

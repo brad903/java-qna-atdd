@@ -1,10 +1,9 @@
 package codesquad.service;
 
-import codesquad.UnAuthorizedException;
+import codesquad.CannotDeleteException;
 import codesquad.domain.Question;
 import codesquad.domain.QuestionRepository;
 import codesquad.domain.User;
-import codesquad.domain.UserRepository;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,7 +22,10 @@ import static org.slf4j.LoggerFactory.getLogger;
 @RunWith(MockitoJUnitRunner.class)
 public class QnaServiceTest extends BaseTest {
     private static final Logger log = getLogger(QnaServiceTest.class);
-    public static final long QUESTION_ID = 1L;
+    public static final long VALID_QUESTION_ID = 1L;
+    public static final long INVALID_QUESTION_ID = 100L;
+    public static final long VALID_USER_ID = 1L;
+    public static final long INVALID_USER_ID = 2L;
 
     @Mock
     private QuestionRepository questionRepository;
@@ -32,16 +34,19 @@ public class QnaServiceTest extends BaseTest {
     private QnaService qnaService;
 
     User user;
+    User fakeUser;
     Question question;
     Question modifiedQuestion;
 
     @Before
     public void setUp() throws Exception {
         user = new User("brad903", "1234", "Brad", "brad903@naver.com");
-        user.setId(1L);
+        user.setId(VALID_USER_ID);
+        fakeUser = new User("leejh903", "1234", "브래드", "leejh903@gmail.com");
+        fakeUser.setId(INVALID_USER_ID);
         question = new Question("제목 테스트", "내용 테스트 - 코드스쿼드 qna-atdd step2 진행중입니다");
         question.writeBy(user);
-        question.setId(QUESTION_ID);
+        question.setId(VALID_QUESTION_ID);
         modifiedQuestion = new Question("업데이트된 제목", "업데이트된 내용입니다");
         when(questionRepository.findById(question.getId())).thenReturn(Optional.of(question));
     }
@@ -55,6 +60,24 @@ public class QnaServiceTest extends BaseTest {
 
     @Test(expected = EntityNotFoundException.class)
     public void update_cannot_found_question() {
-        Question updatedQuestion = qnaService.update(user, 27L, modifiedQuestion);
+        Question updatedQuestion = qnaService.update(user, INVALID_QUESTION_ID, modifiedQuestion);
     }
+
+    @Test
+    public void delete_succeed() throws CannotDeleteException {
+        qnaService.deleteQuestion(user, VALID_QUESTION_ID);
+        softly.assertThat(question.isDeleted()).isEqualTo(true);
+    }
+
+    @Test(expected = EntityNotFoundException.class)
+    public void delete_cannot_found_question() throws CannotDeleteException {
+        qnaService.deleteQuestion(user, INVALID_QUESTION_ID);
+    }
+
+    @Test(expected = CannotDeleteException.class)
+    public void delete_not_same_writer() throws CannotDeleteException {
+        qnaService.deleteQuestion(fakeUser, VALID_QUESTION_ID);
+    }
+
+
 }
