@@ -1,6 +1,5 @@
 package codesquad.web;
 
-import codesquad.domain.Question;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -11,24 +10,21 @@ import org.springframework.util.MultiValueMap;
 import support.test.AcceptanceTest;
 import support.test.HtmlFormDataBuilder;
 
+import static codesquad.domain.QuestionTest.question;
+import static codesquad.domain.QuestionTest.updatedQuestion;
 import static org.slf4j.LoggerFactory.getLogger;
 
 public class QuestionAcceptanceTest extends AcceptanceTest {
     private static final Logger log = getLogger(QuestionAcceptanceTest.class);
-    Question testQuestion;
-    Question updatedQuestion;
     HttpEntity<MultiValueMap<String, Object>> testRequest;
     HttpEntity<MultiValueMap<String, Object>> updateRequest;
     HttpEntity<MultiValueMap<String, Object>> deleteRequest;
 
     @Before
     public void setUp() throws Exception {
-        testQuestion = new Question("제목 테스트", "내용 테스트 - 코드스쿼드 qna-atdd step2 진행중입니다");
-        updatedQuestion = new Question("업데이트된 제목", "업데이트된 내용입니다");
-
         testRequest = HtmlFormDataBuilder.urlEncodedForm()
-                .addParameter("title", testQuestion.getTitle())
-                .addParameter("contents", testQuestion.getContents())
+                .addParameter("title", question.getTitle())
+                .addParameter("contents", question.getContents())
                 .build();
 
         updateRequest = HtmlFormDataBuilder.urlEncodedForm().put()
