@@ -1,18 +1,29 @@
 package codesquad.web;
 
-import codesquad.domain.Answer;
 import codesquad.domain.User;
-import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import support.test.AcceptanceTest;
+
+import java.util.List;
 
 import static codesquad.domain.UserTest.newUser;
 
 public class ApiUserAcceptanceTest extends AcceptanceTest {
     private static final Logger log = LoggerFactory.getLogger(ApiUserAcceptanceTest.class);
+
+    @Test
+    public void showAll() {
+        ResponseEntity<List<User>> response = template().exchange("/api/users", HttpMethod.GET, null, new ParameterizedTypeReference<List<User>>(){});
+        List<User> users = response.getBody();
+        log.info("----- showAll 메서드 확인 -----");
+        for (User user : users) {
+            System.out.println(user);
+        }
+    }
 
     @Test
     public void create() throws Exception {
