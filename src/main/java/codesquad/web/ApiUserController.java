@@ -11,18 +11,12 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.net.URI;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/users")
 public class ApiUserController {
     @Resource(name = "userService")
     private UserService userService;
-
-    @GetMapping("")
-    public List<User> showAll() {
-        return userService.findAll();
-    }
 
     @PostMapping("")
     public ResponseEntity<Void> create(@Valid @RequestBody User user) {
