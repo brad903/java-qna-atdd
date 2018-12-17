@@ -4,11 +4,8 @@ import codesquad.domain.User;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import support.test.AcceptanceTest;
-
-import java.util.List;
 
 import static codesquad.domain.UserTest.newUser;
 
@@ -16,20 +13,10 @@ public class ApiUserAcceptanceTest extends AcceptanceTest {
     private static final Logger log = LoggerFactory.getLogger(ApiUserAcceptanceTest.class);
 
     @Test
-    public void showAll() {
-        ResponseEntity<List<User>> response = template().exchange("/api/users", HttpMethod.GET, null, new ParameterizedTypeReference<List<User>>(){});
-        List<User> users = response.getBody();
-        log.info("----- showAll 메서드 확인 -----");
-        for (User user : users) {
-            System.out.println(user);
-        }
-    }
-
-    @Test
     public void create() throws Exception {
         User newUser = newUser("testuser1");
         String location = createResource("/api/users", newUser);
-        User dbUser = getForObject(location, User.class, findByUserId(newUser.getUserId()));
+        User dbUser = template().getForObject(location, User.class, findByUserId(newUser.getUserId()));
         softly.assertThat(dbUser).isNotNull();
     }
 
@@ -37,7 +24,7 @@ public class ApiUserAcceptanceTest extends AcceptanceTest {
     public void show_다른_사람() throws Exception {
         User newUser = newUser("testuser2");
         String location = createResource("/api/users", newUser);
-        ResponseEntity<Void> response = getForEntity(location, Void.class, defaultUser());
+        ResponseEntity<Void> response = basicAuthTemplate().getForEntity(location, Void.class);
         softly.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
     }
 
@@ -45,7 +32,7 @@ public class ApiUserAcceptanceTest extends AcceptanceTest {
     public void update() throws Exception {
         User newUser = newUser("testuser3");
         String location = createResource("/api/users", newUser);
-        User original = getForObject(location, User.class, newUser);
+        User original = basicAuthTemplate(newUser).getForObject(location, User.class);
 
         User updateUser = new User(original.getId(), original.getUserId(), original.getPassword(), "javajigi2", "javajigi2@slipp.net");
 
@@ -60,7 +47,7 @@ public class ApiUserAcceptanceTest extends AcceptanceTest {
     public void update_no_login() throws Exception {
         User newUser = newUser("testuser4");
         String location = createResource("/api/users", newUser);  // location : /api/users/3
-        User original = getForObject(location, User.class, newUser);
+        User original = basicAuthTemplate(newUser).getForObject(location, User.class);
 
         User updateUser = new User(original.getId(), original.getUserId(), original.getPassword(), "javajigi2", "javajigi2@slipp.net");
 

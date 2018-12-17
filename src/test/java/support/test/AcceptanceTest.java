@@ -44,18 +44,8 @@ public abstract class AcceptanceTest extends BaseTest {
     }
 
     protected String createResource(String path, Object bodyPayload) {
-        ResponseEntity<Void> response = template().postForEntity(path, bodyPayload, Void.class);
+        ResponseEntity<Void> response = basicAuthTemplate().postForEntity(path, bodyPayload, Void.class);
         softly.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         return response.getHeaders().getLocation().getPath();
-    }
-
-    protected <T> ResponseEntity<T> getForEntity(String location, Class<T> responseType,
-                                              User loginUser) throws RestClientException {
-        return basicAuthTemplate(loginUser).getForEntity(location, responseType, loginUser);
-    }
-
-    protected <T> T getForObject(String location, Class<T> responseType, User loginUser)
-            throws RestClientException {
-        return basicAuthTemplate(loginUser).getForObject(location, responseType, loginUser);
     }
 }
