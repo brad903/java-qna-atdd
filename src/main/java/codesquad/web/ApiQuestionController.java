@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -20,8 +21,6 @@ import static org.slf4j.LoggerFactory.getLogger;
 @RestController
 @RequestMapping("/api/questions")
 public class ApiQuestionController {
-    private static final Logger log = getLogger(ApiQuestionController.class);
-
     @Resource(name = "qnaService")
     private QnaService qnaService;
 
@@ -37,5 +36,10 @@ public class ApiQuestionController {
     @GetMapping("{id}")
     public Question show(@PathVariable Long id) {
         return qnaService.findById(id).orElseThrow(EntityNotFoundException::new);
+    }
+
+    @PutMapping("{id}")
+    public Question udpate(@LoginUser User loginUser, @PathVariable Long id, @Valid @RequestBody Question updatedQuestion) {
+        return qnaService.update(loginUser, id,updatedQuestion);
     }
 }
