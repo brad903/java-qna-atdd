@@ -8,7 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import support.test.AcceptanceTest;
 
-import static codesquad.domain.QuestionTest.updatedQuestion;
+import static codesquad.domain.QuestionTest.UPDATED_QUESTION;
 import static codesquad.domain.UserTest.JUNGHYUN;
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -38,10 +38,10 @@ public class ApiQuestionControllerTest extends AcceptanceTest {
         String location = createResource("/api/questions", newQuestion);
         Question original = template().getForObject(location, Question.class);
 
-        ResponseEntity<Question> responseEntity = basicAuthTemplate().exchange(location, HttpMethod.PUT, createHttpEntity(updatedQuestion), Question.class);
+        ResponseEntity<Question> responseEntity = basicAuthTemplate().exchange(location, HttpMethod.PUT, createHttpEntity(UPDATED_QUESTION), Question.class);
 
         softly.assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
-        softly.assertThat(updatedQuestion.equalsTitleAndContents(responseEntity.getBody())).isTrue();
+        softly.assertThat(UPDATED_QUESTION.equalsTitleAndContents(responseEntity.getBody())).isTrue();
     }
 
     @Test
@@ -49,7 +49,7 @@ public class ApiQuestionControllerTest extends AcceptanceTest {
         Question newQuestion = new Question("테스트 질문4", "테스트 내용4");
         String location = createResource("/api/questions", newQuestion);
 
-        ResponseEntity<Void> responseEntity = template().exchange(location, HttpMethod.PUT, createHttpEntity(updatedQuestion), Void.class);
+        ResponseEntity<Void> responseEntity = template().exchange(location, HttpMethod.PUT, createHttpEntity(UPDATED_QUESTION), Void.class);
         softly.assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
     }
 
@@ -58,7 +58,7 @@ public class ApiQuestionControllerTest extends AcceptanceTest {
         Question newQuestion = new Question("테스트 질문5", "테스트 내용5");
         String location = createResource("/api/questions", newQuestion);
 
-        ResponseEntity<Void> responseEntity = basicAuthTemplate(JUNGHYUN).exchange(location, HttpMethod.PUT, createHttpEntity(updatedQuestion), Void.class);
+        ResponseEntity<Void> responseEntity = basicAuthTemplate(JUNGHYUN).exchange(location, HttpMethod.PUT, createHttpEntity(UPDATED_QUESTION), Void.class);
         softly.assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
     }
 }

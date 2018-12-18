@@ -10,8 +10,8 @@ import org.springframework.util.MultiValueMap;
 import support.test.AcceptanceTest;
 import support.test.HtmlFormDataBuilder;
 
-import static codesquad.domain.QuestionTest.question;
-import static codesquad.domain.QuestionTest.updatedQuestion;
+import static codesquad.domain.QuestionTest.QUESTION;
+import static codesquad.domain.QuestionTest.UPDATED_QUESTION;
 import static org.slf4j.LoggerFactory.getLogger;
 
 public class QuestionAcceptanceTest extends AcceptanceTest {
@@ -23,13 +23,13 @@ public class QuestionAcceptanceTest extends AcceptanceTest {
     @Before
     public void setUp() throws Exception {
         testRequest = HtmlFormDataBuilder.urlEncodedForm()
-                .addParameter("title", question.getTitle())
-                .addParameter("contents", question.getContents())
+                .addParameter("title", QUESTION.getTitle())
+                .addParameter("contents", QUESTION.getContents())
                 .build();
 
         updateRequest = HtmlFormDataBuilder.urlEncodedForm().put()
-                .addParameter("title", updatedQuestion.getTitle())
-                .addParameter("contents", updatedQuestion.getContents())
+                .addParameter("title", UPDATED_QUESTION.getTitle())
+                .addParameter("contents", UPDATED_QUESTION.getContents())
                 .build();
 
         deleteRequest = HtmlFormDataBuilder.urlEncodedForm().delete().build();
@@ -117,8 +117,8 @@ public class QuestionAcceptanceTest extends AcceptanceTest {
     public void update_succeed() {
         ResponseEntity<String> response = basicAuthTemplate(defaultUser()).postForEntity("/questions/1", updateRequest, String.class);
         softly.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        softly.assertThat(response.getBody()).contains(updatedQuestion.getTitle());
-        softly.assertThat(response.getBody()).contains(updatedQuestion.getContents());
+        softly.assertThat(response.getBody()).contains(UPDATED_QUESTION.getTitle());
+        softly.assertThat(response.getBody()).contains(UPDATED_QUESTION.getContents());
     }
 
     @Test
