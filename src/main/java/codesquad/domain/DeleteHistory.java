@@ -1,5 +1,8 @@
 package codesquad.domain;
 
+import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.data.annotation.CreatedDate;
+
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
@@ -18,7 +21,6 @@ public class DeleteHistory {
     @JoinColumn(foreignKey = @ForeignKey(name = "fk_deletehistory_to_user"))
     private User deletedBy;
 
-    // todo @CreateDate 테스트
     private LocalDateTime createDate = LocalDateTime.now();
 
     public DeleteHistory() {

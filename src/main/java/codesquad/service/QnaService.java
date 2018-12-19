@@ -1,6 +1,7 @@
 package codesquad.service;
 
 import codesquad.CannotDeleteException;
+import codesquad.UnAuthorizedException;
 import codesquad.domain.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,7 +72,12 @@ public class QnaService {
     }
 
     public Answer deleteAnswer(User loginUser, long id) {
-        // TODO 답변 삭제 기능 구현 
-        return null;
+        try {
+            Answer answer = findAnswerById(id);
+            deleteHistoryService.save(answer.delete(loginUser));
+            return answer;
+        } catch(CannotDeleteException e) {
+            throw new UnAuthorizedException();
+        }
     }
 }

@@ -1,5 +1,6 @@
 package codesquad.domain;
 
+import codesquad.CannotDeleteException;
 import codesquad.UnAuthorizedException;
 import org.slf4j.Logger;
 import support.domain.AbstractEntity;
@@ -96,6 +97,11 @@ public class Answer extends AbstractEntity implements UrlGeneratable {
         return this.contents.equals(targetContents);
     }
 
+    public DeleteHistory delete(User loginUser) throws CannotDeleteException {
+        if(!isOwner(loginUser)) throw new CannotDeleteException("다른 유저의 글을 삭제할 수 없습니다!");
+        deleted = true;
+        return new DeleteHistory(ContentType.ANSWER, getId(), loginUser);
+    }
     @Override
     public String generateUrl() {
         return String.format("%s/answers/%d", question.generateUrl(), getId());
@@ -103,6 +109,8 @@ public class Answer extends AbstractEntity implements UrlGeneratable {
 
     @Override
     public String toString() {
-        return "Answer [id=" + getId() + ", writer=" + writer + ", contents=" + contents + "]";
+        return "Answer [id=" + getId() + ", writer=" + writer + ", contents=" + contents + ", deleted=" + deleted + "]";
     }
+
+
 }

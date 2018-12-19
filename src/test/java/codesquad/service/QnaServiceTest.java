@@ -2,10 +2,7 @@ package codesquad.service;
 
 import codesquad.CannotDeleteException;
 import codesquad.UnAuthorizedException;
-import codesquad.domain.Answer;
-import codesquad.domain.AnswerRepository;
-import codesquad.domain.Question;
-import codesquad.domain.QuestionRepository;
+import codesquad.domain.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -30,12 +27,16 @@ public class QnaServiceTest extends BaseTest {
     private static final Logger log = getLogger(QnaServiceTest.class);
     public static final long WRONG_QUESTION_ID = 100L;
     public static final String UPDATED_CONTENTS = "업데이트 답변 콘텐츠";
+    DeleteHistory deleteHistory;
 
     @Mock
     private QuestionRepository questionRepository;
 
     @Mock
     private AnswerRepository answerRepository;
+
+    @Mock
+    private DeleteHistoryService deleteHistoryService;
 
     @InjectMocks
     private QnaService qnaService;
@@ -44,6 +45,9 @@ public class QnaServiceTest extends BaseTest {
     public void setUp() throws Exception {
         when(questionRepository.findById(QUESTION.getId())).thenReturn(Optional.of(QUESTION));
         when(answerRepository.findById(ANSWER.getId())).thenReturn(Optional.of(ANSWER));
+
+        deleteHistory = new DeleteHistory(ContentType.ANSWER, ANSWER.getId(), ANSWER.getWriter());
+        when(deleteHistoryService.save(deleteHistory)).thenReturn(deleteHistory);
     }
 
     @Test
@@ -83,5 +87,16 @@ public class QnaServiceTest extends BaseTest {
     @Test(expected = UnAuthorizedException.class)
     public void update_answer_other_user() {
         qnaService.updateAnswer(JUNGHYUN, ANSWER.getId(), UPDATED_CONTENTS);
+    }
+
+    @Test
+    public void deleteAnswer_성공() throws CannotDeleteException {
+        Answer answer = qnaService.deleteAnswer(BRAD, ANSWER.getId());
+        softly.assertThat(answer.isDeleted()).isTrue();
+    }
+
+    @Test(expected = CannotDeleteException.class)
+    public void deleteAnswer_다른유저() throws CannotDeleteException {
+        Answer answer = qnaService.deleteAnswer(JUNGHYUN, ANSWER.getId());
     }
 }
