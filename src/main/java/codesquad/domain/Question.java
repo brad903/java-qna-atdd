@@ -3,6 +3,7 @@ package codesquad.domain;
 import codesquad.CannotDeleteException;
 import codesquad.UnAuthorizedException;
 import org.hibernate.annotations.Where;
+import org.slf4j.Logger;
 import support.domain.AbstractEntity;
 import support.domain.UrlGeneratable;
 
@@ -12,8 +13,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
 @Entity
 public class Question extends AbstractEntity implements UrlGeneratable {
+    private static final Logger log = getLogger(Question.class);
+
     @Size(min = 3, max = 100)
     @Column(length = 100, nullable = false)
     private String title;
@@ -85,6 +90,7 @@ public class Question extends AbstractEntity implements UrlGeneratable {
 
     public void delete(User loginUser) throws CannotDeleteException {
         if(!isOwner(loginUser)) throw new CannotDeleteException("다른 유저의 글을 삭제할 수 없습니다!");
+        if(!canDelete()) throw new CannotDeleteException("다른 유저의 답변이 있어 글을 삭제할 수 없습니다!");
         this.deleted = true;
         // todo 답변 삭제 추가구현 필요
     }
@@ -93,6 +99,11 @@ public class Question extends AbstractEntity implements UrlGeneratable {
         return deleted;
     }
 
+    private boolean canDelete() {
+        if(answers.stream()
+                .anyMatch(answer -> !answer.isOwner(writer))) return false;
+        return true;
+    }
 
     public Question update(User loginUser, Question updatedQuestion) {
         if(!isOwner(loginUser)) throw new UnAuthorizedException();
