@@ -98,11 +98,6 @@ public class Question extends AbstractEntity implements UrlGeneratable {
         return deleted;
     }
 
-//    private boolean canDelete() {
-//        if(answers.stream().anyMatch(answer -> !answer.isOwner(writer))) return false;
-//        return true;
-//    }
-
     public List<DeleteHistory> processDeletion() throws CannotDeleteException {
         List<DeleteHistory> deletions = new ArrayList(Arrays.asList(new DeleteHistory(ContentType.QUESTION, getId(), writer)));
         deletions.addAll(Answer.delete(answers, writer));
