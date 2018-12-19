@@ -67,8 +67,9 @@ public class QuestionTest extends BaseTest {
     }
 
     @Test
-    public void 답변삭제_프로세스() {
+    public void 답변삭제_프로세스() throws CannotDeleteException {
         QUESTION.processDeletion();
         softly.assertThat(QUESTION.isDeleted()).isTrue();
     }
+
 }

@@ -91,25 +91,22 @@ public class Question extends AbstractEntity implements UrlGeneratable {
 
     public List<DeleteHistory> delete(User loginUser) throws CannotDeleteException {
         if(!isOwner(loginUser)) throw new CannotDeleteException("다른 유저의 글을 삭제할 수 없습니다!");
-        if(!canDelete()) throw new CannotDeleteException("다른 유저의 답변이 있어 글을 삭제할 수 없습니다!");
-        // todo 답변 삭제 추가구현 필요
-        return null;
+        return processDeletion();
     }
 
     public boolean isDeleted() {
         return deleted;
     }
 
-    private boolean canDelete() {
-        if(answers.stream()
-                .anyMatch(answer -> !answer.isOwner(writer))) return false;
-        return true;
-    }
+//    private boolean canDelete() {
+//        if(answers.stream().anyMatch(answer -> !answer.isOwner(writer))) return false;
+//        return true;
+//    }
 
-    public List<DeleteHistory> processDeletion() {
-        deleted = true;
+    public List<DeleteHistory> processDeletion() throws CannotDeleteException {
         List<DeleteHistory> deletions = new ArrayList(Arrays.asList(new DeleteHistory(ContentType.QUESTION, getId(), writer)));
-//        deletions.addAll(Answer.delete(answers))
+        deletions.addAll(Answer.delete(answers, writer));
+        deleted = true;
         return deletions;
     }
 

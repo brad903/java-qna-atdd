@@ -10,12 +10,16 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.Logger;
+import org.springframework.test.util.ReflectionTestUtils;
 import support.test.BaseTest;
 
 import javax.persistence.EntityNotFoundException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
-import static codesquad.domain.AnswerTest.ANSWER;
+import static codesquad.domain.AnswerTest.*;
 import static codesquad.domain.QuestionTest.*;
 import static codesquad.domain.UserTest.BRAD;
 import static codesquad.domain.UserTest.JUNGHYUN;
@@ -98,5 +102,30 @@ public class QnaServiceTest extends BaseTest {
     @Test(expected = CannotDeleteException.class)
     public void deleteAnswer_다른유저() throws CannotDeleteException {
         Answer answer = qnaService.deleteAnswer(JUNGHYUN, ANSWER.getId());
+    }
+
+    @Test
+    public void 질문삭제시_답변삭제_성공() {
+        List<Answer> answersForTest = new ArrayList(Arrays.asList(ANSWER, ANSWER2, ANSWER4, ANSWER5, ANSWER6, ANSWER7));
+        ReflectionTestUtils.setField(QUESTION, "answers", answersForTest);
+        qnaService.deleteQuestion(BRAD, QUESTION.getId());
+
+        softly.assertThat(QUESTION.isDeleted()).isTrue();
+        for (Answer answer : answersForTest) {
+            softly.assertThat(answer.isDeleted()).isTrue();
+        }
+    }
+
+    @Test(expected = UnAuthorizedException.class)
+    public void 질문삭제시_답변삭제_다른유저답변_존재() {
+        List<Answer> answersForTest = new ArrayList(Arrays.asList(ANSWER, ANSWER4, ANSWER5, ANSWER3, ANSWER7, ANSWER6));
+        ReflectionTestUtils.setField(QUESTION, "answers", answersForTest);
+        qnaService.deleteQuestion(BRAD, QUESTION.getId());
+
+        // 롤백 테스트
+        for (Answer answer : answersForTest) {
+            softly.assertThat(answer.isDeleted()).isFalse();
+        }
+        softly.assertThat(QUESTION.isDeleted()).isFalse();
     }
 }

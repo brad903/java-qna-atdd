@@ -49,13 +49,18 @@ public class Answer extends AbstractEntity implements UrlGeneratable {
         this.deleted = false;
     }
 
-    public static List<DeleteHistory> delete(List<Answer> answers) {
+    public static List<DeleteHistory> delete(List<Answer> answers, User writer) throws CannotDeleteException {
         List<DeleteHistory> deletions = new ArrayList<>();
         for (Answer answer : answers) {
-            answer.deleted = true;
-            // todo 답변 삭제 히스토리
+            deletions.add(answer.delete(writer));
         }
         return deletions;
+    }
+
+    public DeleteHistory delete(User loginUser) throws CannotDeleteException {
+        if(!isOwner(loginUser)) throw new CannotDeleteException("다른 유저의 답변을 삭제할 수 없습니다!");
+        deleted = true;
+        return new DeleteHistory(ContentType.ANSWER, getId(), loginUser);
     }
 
     public User getWriter() {
@@ -97,11 +102,6 @@ public class Answer extends AbstractEntity implements UrlGeneratable {
         return this.contents.equals(targetContents);
     }
 
-    public DeleteHistory delete(User loginUser) throws CannotDeleteException {
-        if(!isOwner(loginUser)) throw new CannotDeleteException("다른 유저의 글을 삭제할 수 없습니다!");
-        deleted = true;
-        return new DeleteHistory(ContentType.ANSWER, getId(), loginUser);
-    }
     @Override
     public String generateUrl() {
         return String.format("%s/answers/%d", question.generateUrl(), getId());
