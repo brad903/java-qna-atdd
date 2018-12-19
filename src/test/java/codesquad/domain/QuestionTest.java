@@ -65,4 +65,10 @@ public class QuestionTest extends BaseTest {
         boolean result = ReflectionTestUtils.invokeMethod(QUESTION, "canDelete");
         softly.assertThat(result).isEqualTo(true);
     }
+
+    @Test
+    public void 답변삭제_프로세스() {
+        QUESTION.processDeletion();
+        softly.assertThat(QUESTION.isDeleted()).isTrue();
+    }
 }

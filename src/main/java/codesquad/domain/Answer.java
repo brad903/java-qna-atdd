@@ -8,6 +8,10 @@ import support.domain.UrlGeneratable;
 import javax.persistence.*;
 import javax.validation.constraints.Size;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 import static org.slf4j.LoggerFactory.getLogger;
 
 @Entity
@@ -42,6 +46,15 @@ public class Answer extends AbstractEntity implements UrlGeneratable {
         this.question = question;
         this.contents = contents;
         this.deleted = false;
+    }
+
+    public static List<DeleteHistory> delete(List<Answer> answers) {
+        List<DeleteHistory> deletions = new ArrayList<>();
+        for (Answer answer : answers) {
+            answer.deleted = true;
+            // todo 답변 삭제 히스토리
+        }
+        return deletions;
     }
 
     public User getWriter() {

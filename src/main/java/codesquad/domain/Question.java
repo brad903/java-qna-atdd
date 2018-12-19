@@ -10,6 +10,7 @@ import support.domain.UrlGeneratable;
 import javax.persistence.*;
 import javax.validation.constraints.Size;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -88,11 +89,11 @@ public class Question extends AbstractEntity implements UrlGeneratable {
         return writer.equals(loginUser);
     }
 
-    public void delete(User loginUser) throws CannotDeleteException {
+    public List<DeleteHistory> delete(User loginUser) throws CannotDeleteException {
         if(!isOwner(loginUser)) throw new CannotDeleteException("다른 유저의 글을 삭제할 수 없습니다!");
         if(!canDelete()) throw new CannotDeleteException("다른 유저의 답변이 있어 글을 삭제할 수 없습니다!");
-        this.deleted = true;
         // todo 답변 삭제 추가구현 필요
+        return null;
     }
 
     public boolean isDeleted() {
@@ -103,6 +104,13 @@ public class Question extends AbstractEntity implements UrlGeneratable {
         if(answers.stream()
                 .anyMatch(answer -> !answer.isOwner(writer))) return false;
         return true;
+    }
+
+    public List<DeleteHistory> processDeletion() {
+        deleted = true;
+        List<DeleteHistory> deletions = new ArrayList(Arrays.asList(new DeleteHistory(ContentType.QUESTION, getId(), writer)));
+//        deletions.addAll(Answer.delete(answers))
+        return deletions;
     }
 
     public Question update(User loginUser, Question updatedQuestion) {
@@ -128,4 +136,5 @@ public class Question extends AbstractEntity implements UrlGeneratable {
     public String toString() {
         return "Question [id=" + getId() + ", title=" + title + ", contents=" + contents + ", writer=" + writer + "]";
     }
+
 }
